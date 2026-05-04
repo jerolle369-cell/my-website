@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FreeToolsHub – Simple Text Tools</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+--bg:#050816;
+--bg-alt:#0b1020;
+--card:#111827;
+--accent:#38bdf8;
+--accent-soft:rgba(56,189,248,0.12);
+--text:#e5e7eb;
+--muted:#9ca3af;
+--border:#1f2937;
+--danger:#f97373;
+--radius-lg:18px;
+--radius-md:12px;
+--shadow-soft:0 18px 45px rgba(15,23,42,0.85);
+--shadow-chip:0 10px 25px rgba(15,23,42,0.9);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;}
+body{min-height:100vh;background:radial-gradient(circle at top,#0f172a 0,#020617 55%,#000 100%);color:var(--text);display:flex;justify-content:center;padding:32px 16px;}
+.shell{width:100%;max-width:1120px;background:radial-gradient(circle at top left,#020617 0,#020617 45%,#000 100%);border-radius:32px;border:1px solid rgba(148,163,184,0.18);box-shadow:0 30px 80px rgba(15,23,42,0.95);padding:22px;position:relative;overflow:hidden;}
+.shell::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 0% 0%,rgba(56,189,248,0.12),transparent 55%),radial-gradient(circle at 100% 0%,rgba(129,140,248,0.12),transparent 55%);opacity:0.9;pointer-events:none;}
+.shell-inner{position:relative;z-index:1;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;}
+.window-dots{display:flex;gap:6px;align-items:center;}
+.dot{width:11px;height:11px;border-radius:999px;box-shadow:0 0 0 1px rgba(15,23,42,0.85);}
+.dot.red{background:radial-gradient(circle at 30% 30%,#fecaca,#f97373);}
+.dot.yellow{background:radial-gradient(circle at 30% 30%,#fef3c7,#facc15);}
+.dot.green{background:radial-gradient(circle at 30% 30%,#bbf7d0,#22c55e);}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:28px;height:28px;border-radius:999px;background:radial-gradient(circle at 30% 20%,#e0f2fe,#38bdf8 40%,#0f172a 75%);box-shadow:0 10px 25px rgba(15,23,42,0.9);display:flex;align-items:center;justify-content:center;color:#0b1120;font-weight:800;font-size:15px;letter-spacing:0.04em;}
+.brand-text{display:flex;flex-direction:column;gap:2px;}
+.brand-title{font-size:14px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#e5e7eb;}
+.brand-sub{font-size:11px;color:#9ca3af;}
+.pill{padding:6px 11px;border-radius:999px;border:1px solid rgba(148,163,184,0.35);background:radial-gradient(circle at top left,rgba(15,23,42,0.9),rgba(15,23,42,0.96));color:#e5e7eb;font-size:11px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 10px 25px rgba(15,23,42,0.9);}
+.pill-dot{width:6px;height:6px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#bbf7d0,#22c55e);box-shadow:0 0 0 1px rgba(21,128,61,0.7);}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:18px;}
+@media(max-width:880px){.layout{grid-template-columns:minmax(0,1fr);}body{padding:18px 10px;}.shell{border-radius:24px;padding:18px;}}
+.left{display:flex;flex-direction:column;gap:14px;}
+.headline{font-size:24px;line-height:1.2;letter-spacing:-0.03em;}
+.headline span{background:linear-gradient(120deg,#38bdf8,#a855f7,#f97316);-webkit-background-clip:text;color:transparent;}
+.subcopy{font-size:13px;color:var(--muted);max-width:360px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.chip{font-size:11px;padding:6px 10px;border-radius:999px;border:1px solid rgba(148,163,184,0.4);background:radial-gradient(circle at top left,rgba(15,23,42,0.96),rgba(15,23,42,0.98));color:#e5e7eb;display:inline-flex;align-items:center;gap:6px;box-shadow:var(--shadow-chip);}
+.chip-badge{font-size:9px;padding:3px 7px;border-radius:999px;background:rgba(56,189,248,0.12);color:#7dd3fc;border:1px solid rgba(56,189,248,0.5);}
+.nav{margin-top:6px;padding:7px;border-radius:999px;background:radial-gradient(circle at top left,rgba(15,23,42,0.96),rgba(15,23,42,0.98));border:1px solid rgba(148,163,184,0.4);display:flex;gap:6px;box-shadow:var(--shadow-soft);}
+.nav-btn{flex:1;border-radius:999px;border:1px solid transparent;padding:7px 10px;font-size:11px;color:var(--muted);background:transparent;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 0.16s ease-out;white-space:nowrap;}
+.nav-btn.active{background:radial-gradient(circle at top left,rgba(56,189,248,0.16),rgba(15,23,42,0.96));border-color:rgba(56,189,248,0.7);color:#e5e7eb;box-shadow:0 10px 30px rgba(8,47,73,0.9);}
+.nav-btn:hover:not(.active){background:rgba(15,23,42,0.9);border-color:rgba(148,163,184,0.6);color:#e5e7eb;}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:11px;color:var(--muted);}
+.meta-pill{padding:5px 9px;border-radius:999px;border:1px solid rgba(148,163,184,0.4);background:radial-gradient(circle at top left,rgba(15,23,42,0.96),rgba(15,23,42,0.98));display:inline-flex;align-items:center;gap:6px;}
+.meta-dot{width:6px;height:6px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#bfdbfe,#60a5fa);}
+.right{background:radial-gradient(circle at top left,rgba(15,23,42,0.98),#020617);border-radius:22px;border:1px solid rgba(148,163,184,0.4);box-shadow:var(--shadow-soft);padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;}
+.right::before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 0% 0%,rgba(56,189,248,0.12),transparent 55%),radial-gradient(circle at 100% 0%,rgba(129,140,248,0.12),transparent 55%);opacity:0.7;pointer-events:none;}
+.right-inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:10px;}
+.tool-panel{display:block;}
+.hidden{display:none !important;}
+.tool-header{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.tool-title-wrap{display:flex;flex-direction:column;gap:2px;}
+.tool-title{font-size:14px;font-weight:600;letter-spacing:-0.01em;display:flex;align-items:center;gap:6px;}
+.tool-tag{font-size:10px;padding:3px 7px;border-radius:999px;background:rgba(56,189,248,0.12);color:#7dd3fc;border:1px solid rgba(56,189,248,0.5);}
+.tool-sub{font-size:11px;color:var(--muted);}
+.stats-row{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;}
+.stat-pill{padding:5px 9px;border-radius:999px;border:1px solid rgba(148,163,184,0.4);background:radial-gradient(circle at top left,rgba(15,23,42,0.96),rgba(15,23,42,0.98));display:inline-flex;align-items:center;gap:6px;color:#e5e7eb;}
+.stat-pill strong{font-weight:600;color:#e5e7eb;}
+.io-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);gap:10px;margin-top:4px;}
+@media(max-width:720px){.io-grid{grid-template-columns:minmax(0,1fr);}}
+.panel{background:radial-gradient(circle at top left,#020617,#020617 55%,#000 100%);border-radius:16px;border:1px solid rgba(31,41,55,0.9);box-shadow:0 18px 40px rgba(15,23,42,0.95);padding:10px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden;}
+.panel-label-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);}
+.panel-label-row span.left-label{display:inline-flex;align-items:center;gap:6px;}
+.panel-label-row span.left-label-dot{width:7px;height:7px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#a5b4fc,#6366f1);}
+.panel-label-row span.right-label{font-size:10px;color:#6b7280;}
+textarea{width:100%;min-height:150px;resize:vertical;border-radius:12px;border:1px solid rgba(31,41,55,0.95);background:radial-gradient(circle at top left,#020617,#020617 55%,#000 100%);color:#e5e7eb;padding:10px 11px;font-size:12px;line-height:1.5;outline:none;box-shadow:inset 0 0 0 1px rgba(15,23,42,0.9);}
+textarea::placeholder{color:#4b5563;}
+.textarea-footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:10px;color:var(--muted);}
+.textarea-footer span{display:inline-flex;align-items:center;gap:4px;}
+.textarea-footer span.dot{width:6px;height:6px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#bfdbfe,#60a5fa);}
+.controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.btn{border-radius:999px;border:1px solid rgba(148,163,184,0.5);background:radial-gradient(circle at top left,rgba(15,23,42,0.98),rgba(15,23,42,1));color:#e5e7eb;font-size:11px;padding:6px 10px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:all 0.16s ease-out;box-shadow:0 12px 30px rgba(15,23,42,0.95);}
+.btn.primary{border-color:rgba(56,189,248,0.7);background:radial-gradient(circle at top left,rgba(56,189,248,0.18),rgba(15,23,42,0.98));box-shadow:0 16px 40px rgba(8,47,73,0.95);}
+.btn:hover{transform:translateY(-1px);box-shadow:0 18px 45px rgba(15,23,42,0.98);border-color:rgba(148,163,184,0.8);}
+.btn.primary:hover{border-color:rgba(56,189,248,0.9);box-shadow:0 20px 55px rgba(8,47,73,1);}
+.btn:active{transform:translateY(0);box-shadow:0 10px 25px rgba(15,23,42,0.9);}
+.output-box{min-height:150px;border-radius:12px;border:1px dashed rgba(55,65,81,0.9);background:radial-gradient(circle at top left,rgba(15,23,42,0.98),#020617);padding:10px 11px;font-size:12px;color:#e5e7eb;overflow-wrap:break-word;white-space:pre-wrap;}
+.output-placeholder{color:#4b5563;font-size:11px;}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;font-size:10px;color:var(--muted);}
+.badge{padding:4px 8px;border-radius:999px;border:1px solid rgba(55,65,81,0.9);background:radial-gradient(circle at top left,rgba(15,23,42,0.98),#020617);display:inline-flex;align-items:center;gap:5px;}
+.badge-dot{width:6px;height:6px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#facc15,#f97316);}
+.footer-row{margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted);flex-wrap:wrap;gap:6px;}
+.footer-row a{color:#7dd3fc;text-decoration:none;}
+.footer-row a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="shell">
+<div class="shell-inner">
+<div class="top-bar">
+<div class="window-dots">
+<div class="dot red"></div>
+<div class="dot yellow"></div>
+<div class="dot green"></div>
+</div>
+<div class="brand">
+<div class="brand-mark">FT</div>
+<div class="brand-text">
+<div class="brand-title">FREETOOLSHUB</div>
+<div class="brand-sub">Instant text utilities in one lightweight page</div>
+</div>
+</div>
+<div class="pill"><span class="pill-dot"></span>Live · No login · No tracking</div>
+</div>
+<div class="layout">
+<div class="left">
+<div class="headline">Simple text tools for <span>fast everyday work</span>.</div>
+<div class="subcopy">Paste text once, switch tools instantly. No clutter, no ads in your face, no account needed.</div>
+<div class="chips">
+<div class="chip"><span class="chip-badge">Core tools</span>Word & character counts</div>
+<div class="chip"><span class="chip-badge">Formatting</span>Case conversion & line cleanup</div>
+<div class="chip"><span class="chip-badge">Fast</span>All in a single static file</div>
+</div>
+<div class="nav" id="tool-nav">
+<button class="nav-btn active" data-tool="word-counter">🔢 Word Counter</button>
+<button class="nav-btn" data-tool="char-counter">🔡 Character Counter</button>
+<button class="nav-btn" data-tool="case-converter">🧱 Case Converter</button>
+<button class="nav-btn" data-tool="line-breaks">↩️ Remove Line Breaks</button>
+</div>
+<div class="meta-row">
+<div class="meta-pill"><span class="meta-dot"></span>100% client-side · Your text never leaves the browser</div>
+<div class="meta-pill"><span class="meta-dot"></span>Built for quick copy–paste workflows</div>
+</div>
+</div>
+<div class="right">
+<div class="right-inner">
+<section class="tool-panel" id="tool-word-counter">
+<div class="tool-header">
+<div class="tool-title-wrap">
+<div class="tool-title">Word Counter <span class="tool-tag">Live stats</span></div>
+<div class="tool-sub">Count words, characters, sentences, and paragraphs as you type or paste.</div>
+</div>
+</div>
+<div class="stats-row" id="wc-stats">
+<div class="stat-pill"><strong id="wc-words">0</strong> words</div>
+<div class="stat-pill"><strong id="wc-chars">0</strong> characters</div>
+<div class="stat-pill"><strong id="wc-chars-no-space">0</strong> chars (no spaces)</div>
+<div class="stat-pill"><strong id="wc-sentences">0</strong> sentences</div>
+<div class="stat-pill"><strong id="wc-paragraphs">0</strong> paragraphs</div>
+</div>
+<div class="io-grid">
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Input text</span><span class="right-label">Paste or type · updates instantly</span></div>
+<textarea id="wc-input" placeholder="Paste your text here to see live counts..."></textarea>
+<div class="textarea-footer"><span><span class="dot"></span>Live counting enabled</span><span id="wc-last-updated">Waiting for input…</span></div>
+<div class="controls">
+<button class="btn primary" id="wc-copy">📋 Copy text</button>
+<button class="btn" id="wc-clear">🧹 Clear</button>
+</div>
+</div>
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Summary</span><span class="right-label">Quick snapshot</span></div>
+<div class="output-box" id="wc-summary"><div class="output-placeholder">Start typing on the left to see a summary of your text here.</div></div>
+<div class="badge-row"><div class="badge"><span class="badge-dot"></span>Great for blog posts, descriptions, and social captions.</div></div>
+</div>
+</div>
+</section>
+</div>
+
+<section class="tool-panel hidden" id="tool-char-counter">
+<div class="tool-header">
+<div class="tool-title-wrap">
+<div class="tool-title">Character Counter <span class="tool-tag">Instant count</span></div>
+<div class="tool-sub">Count characters with and without spaces.</div>
+</div>
+</div>
+<div class="stats-row" id="cc-stats">
+<div class="stat-pill"><strong id="cc-chars">0</strong> characters</div>
+<div class="stat-pill"><strong id="cc-chars-no-space">0</strong> chars (no spaces)</div>
+</div>
+<div class="io-grid">
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Input text</span><span class="right-label">Paste or type</span></div>
+<textarea id="cc-input" placeholder="Paste text here..."></textarea>
+<div class="textarea-footer"><span><span class="dot"></span>Live counting</span><span id="cc-last-updated">Waiting for input…</span></div>
+<div class="controls">
+<button class="btn primary" id="cc-copy">📋 Copy text</button>
+<button class="btn" id="cc-clear">🧹 Clear</button>
+</div>
+</div>
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Summary</span><span class="right-label">Quick snapshot</span></div>
+<div class="output-box" id="cc-summary"><div class="output-placeholder">Start typing to see character stats.</div></div>
+</div>
+</div>
+</section>
+
+<section class="tool-panel hidden" id="tool-case-converter">
+<div class="tool-header">
+<div class="tool-title-wrap">
+<div class="tool-title">Case Converter <span class="tool-tag">Formatting</span></div>
+<div class="tool-sub">Convert text to upper, lower, title, or sentence case.</div>
+</div>
+</div>
+<div class="io-grid">
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Input text</span><span class="right-label">Paste or type</span></div>
+<textarea id="ccv-input" placeholder="Paste text to convert..."></textarea>
+<div class="controls">
+<button class="btn primary" data-mode="upper">🔠 UPPERCASE</button>
+<button class="btn primary" data-mode="lower">🔡 lowercase</button>
+<button class="btn primary" data-mode="title">📝 Title Case</button>
+<button class="btn primary" data-mode="sentence">✒️ Sentence case</button>
+<button class="btn" id="ccv-clear">🧹 Clear</button>
+</div>
+</div>
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Output</span><span class="right-label">Converted text</span></div>
+<div class="output-box" id="ccv-output"><div class="output-placeholder">Converted text will appear here.</div></div>
+<div class="controls">
+<button class="btn primary" id="ccv-copy">📋 Copy output</button>
+</div>
+</div>
+</div>
+</section>
+
+<section class="tool-panel hidden" id="tool-line-breaks">
+<div class="tool-header">
+<div class="tool-title-wrap">
+<div class="tool-title">Remove Line Breaks <span class="tool-tag">Cleanup</span></div>
+<div class="tool-sub">Remove all line breaks or convert them to spaces.</div>
+</div>
+</div>
+<div class="io-grid">
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Input text</span><span class="right-label">Paste or type</span></div>
+<textarea id="lb-input" placeholder="Paste text with line breaks..."></textarea>
+<div class="controls">
+<button class="btn primary" id="lb-remove">❌ Remove breaks</button>
+<button class="btn primary" id="lb-space">↔️ Breaks → spaces</button>
+<button class="btn" id="lb-clear">🧹 Clear</button>
+</div>
+</div>
+<div class="panel">
+<div class="panel-label-row"><span class="left-label"><span class="left-label-dot"></span>Output</span><span class="right-label">Cleaned text</span></div>
+<div class="output-box" id="lb-output"><div class="output-placeholder">Cleaned text will appear here.</div></div>
+<div class="controls">
+<button class="btn primary" id="lb-copy">📋 Copy output</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+
+<div class="footer-row">
+<div>© 2025 FreeToolsHub · All tools run locally in your browser</div>
+<div><a href="#">Privacy</a> · <a href="#">Contact</a></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<script>
+function switchTool(toolId){
+document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.remove('active'));
+document.querySelector('.nav-btn[data-tool="'+toolId+'"]').classList.add('active');
+document.querySelectorAll('.tool-panel').forEach(p=>p.classList.add('hidden'));
+document.getElementById('tool-'+toolId).classList.remove('hidden');
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+btn.addEventListener('click',()=>switchTool(btn.dataset.tool));
+});
+
+function updateWordCounter(){
+let text=document.getElementById('wc-input').value;
+let words=text.trim().split(/\s+/).filter(Boolean).length;
+let chars=text.length;
+let charsNoSpace=text.replace(/\s+/g,'').length;
+let sentences=(text.match(/[.!?]+/g)||[]).length;
+let paragraphs=text.split(/\n+/).filter(p=>p.trim().length>0).length;
+
+document.getElementById('wc-words').textContent=words;
+document.getElementById('wc-chars').textContent=chars;
+document.getElementById('wc-chars-no-space').textContent=charsNoSpace;
+document.getElementById('wc-sentences').textContent=sentences;
+document.getElementById('wc-paragraphs').textContent=paragraphs;
+
+document.getElementById('wc-summary').innerHTML=
+words===0
+? '<div class="output-placeholder">Start typing on the left to see a summary of your text here.</div>'
+: 'Words: '+words+'\nCharacters: '+chars+'\nCharacters (no spaces): '+charsNoSpace+'\nSentences: '+sentences+'\nParagraphs: '+paragraphs;
+
+document.getElementById('wc-last-updated').textContent='Updated just now';
+}
+
+document.getElementById('wc-input').addEventListener('input',updateWordCounter);
+document.getElementById('wc-copy').addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('wc-input').value));
+document.getElementById('wc-clear').addEventListener('click',()=>{document.getElementById('wc-input').value='';updateWordCounter();});
+
+function updateCharCounter(){
+let text=document.getElementById('cc-input').value;
+document.getElementById('cc-chars').textContent=text.length;
+document.getElementById('cc-chars-no-space').textContent=text.replace(/\s+/g,'').length;
+document.getElementById('cc-summary').innerHTML=
+text.length===0
+? '<div class="output-placeholder">Start typing to see character stats.</div>'
+: 'Characters: '+text.length+'\nCharacters (no spaces): '+text.replace(/\s+/g,'').length;
+document.getElementById('cc-last-updated').textContent='Updated just now';
+}
+
+document.getElementById('cc-input').addEventListener('input',updateCharCounter);
+document.getElementById('cc-copy').addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('cc-input').value));
+document.getElementById('cc-clear').addEventListener('click',()=>{document.getElementById('cc-input').value='';updateCharCounter();});
+
+function convertCase(mode){
+let text=document.getElementById('ccv-input').value;
+let out='';
+if(mode==='upper') out=text.toUpperCase();
+if(mode==='lower') out=text.toLowerCase();
+if(mode==='title') out=text.replace(/\w\S*/g,w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase());
+if(mode==='sentence') out=text.charAt(0).toUpperCase()+text.slice(1).toLowerCase();
+document.getElementById('ccv-output').textContent=out||'';
+}
+
+document.querySelectorAll('#tool-case-converter .btn.primary[data-mode]').forEach(btn=>{
+btn.addEventListener('click',()=>convertCase(btn.dataset.mode));
+});
+
+document.getElementById('ccv-copy').addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('ccv-output').textContent));
+document.getElementById('ccv-clear').addEventListener('click',()=>{document.getElementById('ccv-input').value='';document.getElementById('ccv-output').innerHTML='<div class="output-placeholder">Converted text will appear here.</div>';});
+
+function removeBreaks(){
+let text=document.getElementById('lb-input').value;
+document.getElementById('lb-output').textContent=text.replace(/\n+/g,'');
+}
+
+function breaksToSpaces(){
+let text=document.getElementById('lb-input').value;
+document.getElementById('lb-output').textContent=text.replace(/\n+/g,' ');
+}
+
+document.getElementById('lb-remove').addEventListener('click',removeBreaks);
+document.getElementById('lb-space').addEventListener('click',breaksToSpaces);
+document.getElementById('lb-copy').addEventListener('click',()=>navigator.clipboard.writeText(document.getElementById('lb-output').textContent));
+document.getElementById('lb-clear').addEventListener('click',()=>{document.getElementById('lb-input').value='';document.getElementById('lb-output').innerHTML='<div class="output-placeholder">Cleaned text will appear here.</div>';});
+</script>
+
+</body>
+</html>
